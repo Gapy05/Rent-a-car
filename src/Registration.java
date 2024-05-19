@@ -1,30 +1,79 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+
+class Kraj {
+    private int id;
+    private String ime;
+
+    public Kraj(int id, String ime) {
+        this.id = id;
+        this.ime = ime;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getIme() {
+        return ime;
+    }
+
+    @Override
+    public String toString() {
+        return ime;
+    }
+}
+class PasswordHash {
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest(password.getBytes());
+            return bytesToHex(hashedBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
 
 class MyFrame extends JFrame implements ActionListener {
-
-    // Components of the Form
     private Container c;
     private JLabel title;
-    private JLabel name;
+    private JLabel ime;
     private JTextField tname;
+    private JLabel priimek;
+    private JTextField tpriimek;
+    private JLabel username;
+    private JTextField tusername;
+    private JLabel geslo;
+    private JPasswordField tgeslo;
     private JLabel email;
     private JTextField temail;
-    private JLabel password;
-    private JPasswordField tpassword;
-    private JLabel mno;
-    private JTextField tmno;
+    private JLabel telefon;
+    private JTextField ttelefon;
     private JLabel gender;
     private JRadioButton male;
     private JRadioButton female;
     private ButtonGroup gengp;
     private JLabel dob;
-    private JComboBox date;
-    private JComboBox month;
-    private JComboBox year;
-    private JLabel add;
-    private JTextArea tadd;
+    private JComboBox<String> date;
+    private JComboBox<String> month;
+    private JComboBox<String> year;
+    private JLabel kraj;
+    private JComboBox<Kraj> tkraj;
     private JButton sub;
     private JButton reset;
     private JTextArea tout;
@@ -40,7 +89,7 @@ class MyFrame extends JFrame implements ActionListener {
             "26", "27", "28", "29", "30",
             "31" };
     private String meseci[]
-            = { "Jan", "feb", "Mar", "Apr",
+            = { "Jan", "Feb", "Mar", "Apr",
             "Maj", "Jun", "Jul", "Aug",
             "Sep", "Okt", "Nov", "Dec" };
     private String leta[]
@@ -67,48 +116,96 @@ class MyFrame extends JFrame implements ActionListener {
         title.setLocation(300, 30);
         c.add(title);
 
-        name = new JLabel("Ime");
-        name.setFont(new Font("Arial", Font.PLAIN, 20));
-        name.setSize(100, 20);
-        name.setLocation(100, 100);
-        c.add(name);
+        ime = new JLabel("Ime");
+        ime.setFont(new Font("Arial", Font.PLAIN, 20));
+        ime.setSize(100, 20);
+        ime.setLocation(100, 100);
+        c.add(ime);
 
         tname = new JTextField();
         tname.setFont(new Font("Arial", Font.PLAIN, 15));
         tname.setSize(190, 20);
-        tname.setLocation(200, 100);
+        tname.setLocation(250, 100);
         c.add(tname);
 
-        mno = new JLabel("Telefon");
-        mno.setFont(new Font("Arial", Font.PLAIN, 20));
-        mno.setSize(100, 20);
-        mno.setLocation(100, 150);
-        c.add(mno);
+        priimek = new JLabel("Priimek");
+        priimek.setFont(new Font("Arial", Font.PLAIN, 20));
+        priimek.setSize(100, 20);
+        priimek.setLocation(100, 130);
+        c.add(priimek);
 
-        tmno = new JTextField();
-        tmno.setFont(new Font("Arial", Font.PLAIN, 15));
-        tmno.setSize(150, 20);
-        tmno.setLocation(200, 150);
-        c.add(tmno);
+        tpriimek = new JTextField();
+        tpriimek.setFont(new Font("Arial", Font.PLAIN, 15));
+        tpriimek.setSize(190, 20);
+        tpriimek.setLocation(250, 130);
+        c.add(tpriimek);
+
+        username = new JLabel("Uporabniško ime");
+        username.setFont(new Font("Arial", Font.PLAIN, 20));
+        username.setSize(150, 20);
+        username.setLocation(100, 160);
+        c.add(username);
+
+        tusername = new JTextField();
+        tusername.setFont(new Font("Arial", Font.PLAIN, 15));
+        tusername.setSize(190, 20);
+        tusername.setLocation(250, 160);
+        c.add(tusername);
+
+        geslo = new JLabel("Geslo");
+        geslo.setFont(new Font("Arial", Font.PLAIN, 20));
+        geslo.setSize(100, 20);
+        geslo.setLocation(100, 190);
+        c.add(geslo);
+
+        tgeslo = new JPasswordField();
+        tgeslo.setFont(new Font("Arial", Font.PLAIN, 15));
+        tgeslo.setSize(190, 20);
+        tgeslo.setLocation(250, 190);
+        c.add(tgeslo);
+
+        email = new JLabel("Email");
+        email.setFont(new Font("Arial", Font.PLAIN, 20));
+        email.setSize(100, 20);
+        email.setLocation(100, 220);
+        c.add(email);
+
+        temail = new JTextField();
+        temail.setFont(new Font("Arial", Font.PLAIN, 15));
+        temail.setSize(190, 20);
+        temail.setLocation(250, 220);
+        c.add(temail);
+
+        telefon = new JLabel("Telefon");
+        telefon.setFont(new Font("Arial", Font.PLAIN, 20));
+        telefon.setSize(100, 20);
+        telefon.setLocation(100, 250);
+        c.add(telefon);
+
+        ttelefon = new JTextField();
+        ttelefon.setFont(new Font("Arial", Font.PLAIN, 15));
+        ttelefon.setSize(150, 20);
+        ttelefon.setLocation(250, 250);
+        c.add(ttelefon);
 
         gender = new JLabel("Spol");
         gender.setFont(new Font("Arial", Font.PLAIN, 20));
         gender.setSize(100, 20);
-        gender.setLocation(100, 200);
+        gender.setLocation(100, 280);
         c.add(gender);
 
         male = new JRadioButton("Moški");
         male.setFont(new Font("Arial", Font.PLAIN, 15));
         male.setSelected(true);
         male.setSize(75, 20);
-        male.setLocation(200, 200);
+        male.setLocation(250, 280);
         c.add(male);
 
         female = new JRadioButton("Ženska");
         female.setFont(new Font("Arial", Font.PLAIN, 15));
         female.setSelected(false);
         female.setSize(80, 20);
-        female.setLocation(275, 200);
+        female.setLocation(325, 280);
         c.add(female);
 
         gengp = new ButtonGroup();
@@ -118,75 +215,65 @@ class MyFrame extends JFrame implements ActionListener {
         dob = new JLabel("Datum rojstva:");
         dob.setFont(new Font("Arial", Font.PLAIN, 20));
         dob.setSize(300, 20);
-        dob.setLocation(100, 250);
+        dob.setLocation(100, 330);
         c.add(dob);
 
-        date = new JComboBox(datum);
+        date = new JComboBox<String>(datum);
         date.setFont(new Font("Arial", Font.PLAIN, 15));
         date.setSize(50, 20);
-        date.setLocation(250, 250);
+        date.setLocation(250, 330);
         c.add(date);
 
-        month = new JComboBox(meseci);
+        month = new JComboBox<String>(meseci);
         month.setFont(new Font("Arial", Font.PLAIN, 15));
         month.setSize(60, 20);
-        month.setLocation(360, 250);
+        month.setLocation(360, 330);
         c.add(month);
 
-        year = new JComboBox(leta);
+        year = new JComboBox<String>(leta);
         year.setFont(new Font("Arial", Font.PLAIN, 15));
         year.setSize(80, 20);
-        year.setLocation(300, 250);
+        year.setLocation(300, 330);
         c.add(year);
 
-        add = new JLabel("Naslov");
-        add.setFont(new Font("Arial", Font.PLAIN, 20));
-        add.setSize(100, 20);
-        add.setLocation(100, 300);
-        c.add(add);
+        kraj = new JLabel("Kraj");
+        kraj.setFont(new Font("Arial", Font.PLAIN, 20));
+        kraj.setSize(100, 20);
+        kraj.setLocation(100, 360);
+        c.add(kraj);
 
-        tadd = new JTextArea();
-        tadd.setFont(new Font("Arial", Font.PLAIN, 15));
-        tadd.setSize(200, 75);
-        tadd.setLocation(200, 300);
-        tadd.setLineWrap(true);
-        c.add(tadd);
+        tkraj = new JComboBox<Kraj>();
+        tkraj.setFont(new Font("Arial", Font.PLAIN, 15));
+        tkraj.setSize(190, 20);
+        tkraj.setLocation(250, 360);
+        c.add(tkraj);
 
-        email = new JLabel("Email");
-        email.setFont(new Font("Arial", Font.PLAIN, 20));
-        email.setSize(100, 20);
-        email.setLocation(100, 400);
-        c.add(email);
+        try {
+            DatabaseConnection dbConnection = new DatabaseConnection();
+            Connection connection = dbConnection.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT id, ime FROM kraj");
 
-        temail = new JTextField();
-        temail.setFont(new Font("Arial", Font.PLAIN, 15));
-        temail.setSize(190, 20);
-        temail.setLocation(200, 400);
-        c.add(temail);
+            while (resultSet.next()) {
+                tkraj.addItem(new Kraj(resultSet.getInt("id"), resultSet.getString("ime")));
+            }
 
-        password = new JLabel("Geslo");
-        password.setFont(new Font("Arial", Font.PLAIN, 20));
-        password.setSize(100, 20);
-        password.setLocation(100, 450);
-        c.add(password);
-
-        tpassword = new JPasswordField();
-        tpassword.setFont(new Font("Arial", Font.PLAIN, 15));
-        tpassword.setSize(190, 20);
-        tpassword.setLocation(200, 450);
-        c.add(tpassword);
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         sub = new JButton("Registriraj se!");
         sub.setFont(new Font("Arial", Font.PLAIN, 15));
         sub.setSize(200, 20);
-        sub.setLocation(150, 500);
+        sub.setLocation(150, 420);
         sub.addActionListener(this);
         c.add(sub);
 
         reset = new JButton("Reset");
         reset.setFont(new Font("Arial", Font.PLAIN, 15));
         reset.setSize(100, 20);
-        reset.setLocation(380, 500);
+        reset.setLocation(380, 420);
         reset.addActionListener(this);
         c.add(reset);
 
@@ -201,7 +288,7 @@ class MyFrame extends JFrame implements ActionListener {
         res = new JLabel("");
         res.setFont(new Font("Arial", Font.PLAIN, 20));
         res.setSize(500, 25);
-        res.setLocation(100, 550);
+        res.setLocation(100, 520);
         c.add(res);
 
         resadd = new JTextArea();
@@ -216,38 +303,101 @@ class MyFrame extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == sub) {
+            String name = tname.getText();
+            String surname = tpriimek.getText();
+            String username = tusername.getText();
+            String password = new String(tgeslo.getPassword());
+            String email = temail.getText();
+            String phone = ttelefon.getText();
+
+            if (name.isEmpty() || surname.isEmpty() || username.isEmpty() || password.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+                res.setText("Vsa polja so obvezna!");
+                return;
+            }
+
+            if (!email.endsWith("@gmail.com") && !email.endsWith("@mail.com") && !email.endsWith("@email.com") && !email.endsWith("@hotmail.com")) {
+                res.setText("Email mora biti veljaven!");
+                return;
+            }
             String data1;
             String data
-                    = "Name : "
+                    = "Ime : "
                     + tname.getText() + "\n"
-                    + "Mobile : "
-                    + tmno.getText() + "\n";
+                    + "Priimek : "
+                    + tpriimek.getText() + "\n"
+                    + "Uporabniško ime : "
+                    + tusername.getText() + "\n"
+                    + "Geslo : "
+                    + new String(tgeslo.getPassword()) + "\n"
+                    + "Email : "
+                    + temail.getText() + "\n"
+                    + "Telefon : "
+                    + ttelefon.getText() + "\n";
             if (male.isSelected())
-                data1 = "Gender : Male"
+                data1 = "Spol : Moški"
                         + "\n";
             else
-                data1 = "Gender : Female"
+                data1 = "Spol : Ženska"
                         + "\n";
+
+            Map<String, String> monthNumbers = new HashMap<>();
+            monthNumbers.put("Jan", "01");
+            monthNumbers.put("Feb", "02");
+            monthNumbers.put("Mar", "03");
+            monthNumbers.put("Apr", "04");
+            monthNumbers.put("Maj", "05");
+            monthNumbers.put("Jun", "06");
+            monthNumbers.put("Jul", "07");
+            monthNumbers.put("Aug", "08");
+            monthNumbers.put("Sep", "09");
+            monthNumbers.put("Okt", "10");
+            monthNumbers.put("Nov", "11");
+            monthNumbers.put("Dec", "12");
+
+            String dateString = (String)year.getSelectedItem() + "-" + monthNumbers.get((String)month.getSelectedItem()) + "-" + (String)date.getSelectedItem();
             String data2
-                    = "DOB : "
-                    + (String)date.getSelectedItem()
-                    + "/" + (String)month.getSelectedItem()
-                    + "/" + (String)year.getSelectedItem()
+                    = "Datum rojstva : "
+                    + dateString
                     + "\n";
 
-            String data3 = "Address : " + tadd.getText();
+            String data3 = "Kraj : " + ((Kraj)tkraj.getSelectedItem()).getIme();
             tout.setText(data + data1 + data2 + data3);
             tout.setEditable(false);
             res.setText("Uspešno registriran!");
-            String uporabnisko_ime = tname.getText();
 
+            try {
+                DatabaseConnection dbConnection = new DatabaseConnection();
+                Connection connection = dbConnection.getConnection();
+
+                String insertSql = "INSERT INTO uporabnik (ime, priimek, username, geslo, email, telefon, spol, datum_rojstva, kraj_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(insertSql);
+                preparedStatement.setString(1, tname.getText());
+                preparedStatement.setString(2, tpriimek.getText());
+                preparedStatement.setString(3, tusername.getText());
+                preparedStatement.setString(4, PasswordHash.hashPassword(new String(tgeslo.getPassword())));
+                preparedStatement.setString(5, temail.getText());
+                preparedStatement.setString(6, ttelefon.getText());
+                preparedStatement.setString(7, male.isSelected() ? "M" : "Ž");
+                Date date = Date.valueOf(dateString);
+                preparedStatement.setDate(8, date);
+                preparedStatement.setInt(9, ((Kraj)tkraj.getSelectedItem()).getId());
+
+                preparedStatement.executeUpdate();
+
+                connection.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
         else if (e.getSource() == reset) {
             String def = "";
             tname.setText(def);
-            tadd.setText(def);
-            tmno.setText(def);
+            tpriimek.setText(def);
+            tusername.setText(def);
+            tgeslo.setText(def);
+            temail.setText(def);
+            ttelefon.setText(def);
             res.setText(def);
             tout.setText(def);
             date.setSelectedIndex(0);
@@ -258,8 +408,7 @@ class MyFrame extends JFrame implements ActionListener {
     }
 }
 
-class Registration {
-
+public class Registration {
     public static void main(String[] args) throws Exception {
         MyFrame f = new MyFrame();
     }
