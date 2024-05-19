@@ -87,7 +87,6 @@ public class Login extends JFrame implements ActionListener {
 
         setVisible(true);
     }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == login) {
@@ -97,7 +96,8 @@ public class Login extends JFrame implements ActionListener {
             try {
                 DatabaseConnection dbConnection = new DatabaseConnection();
                 Connection connection = dbConnection.getConnection();
-                String sql = "SELECT id FROM uporabnik WHERE username = ? AND geslo = ?";
+                // Include "username" in your SQL query
+                String sql = "SELECT id, username FROM uporabnik WHERE username = ? AND geslo = ?";
                 PreparedStatement statement = connection.prepareStatement(sql);
                 statement.setString(1, username);
                 statement.setString(2, PasswordHash.hashPassword(password));
@@ -105,15 +105,15 @@ public class Login extends JFrame implements ActionListener {
 
                 if (resultSet.next()) {
                     int userId = resultSet.getInt("id");
-                    connection.close();
+                    String userName = resultSet.getString("username");
 
                     if (userId == 5) {
-                        new Admin();
-                    } else {
-                        new rent();
+                        Admin admin = new Admin();
+                        this.setVisible(false);
+                    } else  {
+                        rent rentPage = new rent();
+                        this.setVisible(false);
                     }
-
-                    this.setVisible(false);
                 } else {
                     res.setText("Napačno uporabniško ime ali geslo!");
                 }
@@ -121,6 +121,7 @@ public class Login extends JFrame implements ActionListener {
                 ex.printStackTrace();
                 res.setText("Napaka pri prijavi!");
             }
+
         } else if (e.getSource() == reset) {
             String def = "";
             tusername.setText(def);

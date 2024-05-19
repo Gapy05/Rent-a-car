@@ -25,6 +25,8 @@ public class rent extends JFrame implements ActionListener {
     private JLabel cenaLabel;
     private JLabel cenaLabel1;
 
+
+
     public rent() {
         setTitle("Najem Vozila");
         setBounds(300, 90, 900, 600);
@@ -89,7 +91,7 @@ public class rent extends JFrame implements ActionListener {
         cenaLabel = new JLabel("Cena:");
         cenaLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         cenaLabel.setSize(200, 20);
-        cenaLabel.setLocation(5, 300);
+        cenaLabel.setLocation(50, 300);
         c.add(cenaLabel);
 
         cenaLabel1 = new JLabel(izracunajCenoNajema(zacetniDatumNajemaDropdown.getSelectedItem().toString(), (String) koncniDatumNajemaDropdown.getSelectedItem().toString()) + "€");
@@ -150,17 +152,41 @@ public class rent extends JFrame implements ActionListener {
 
                 String[] deli = izbranoVozilo.split(" - ");
                 int idVozila = Integer.parseInt(deli[0]);
-
                 String sql = "INSERT INTO Najem (Datum_zacetka, Datum_Konca, Cena, Stanje, podjetje_ID, vozilo_ID) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement statement = povezava.prepareStatement(sql);
                 statement.setString(1, izbranDatum);
-                statement.setString(2, (String) koncniDatumNajemaDropdown.getSelectedItem()); // Uporabi izbran končni datum
-                statement.setLong(3, izracunajCenoNajema(izbranDatum, (String) koncniDatumNajemaDropdown.getSelectedItem())); // Izračunaj ceno najema
-
+                statement.setString(2, (String) koncniDatumNajemaDropdown.getSelectedItem());
+                statement.setLong(3, izracunajCenoNajema(izbranDatum, (String) koncniDatumNajemaDropdown.getSelectedItem()));
                 statement.setString(4, "Najeto");
-                statement.setInt(5, podjetjeDropdown.getSelectedIndex() + 1); // Uporabi ID izbranega podjetja
+                statement.setInt(5, podjetjeDropdown.getSelectedIndex() + 1);
                 statement.setInt(6, idVozila);
                 statement.executeUpdate();
+
+
+                try {
+                    // Retrieve the image from the database
+                    String sqlImage = "SELECT slika FROM Vozilo WHERE ID = ?";
+                    PreparedStatement statementImage = povezava.prepareStatement(sqlImage);
+                    statementImage.setInt(1, idVozila);
+                    ResultSet resultSetImage = statementImage.executeQuery();
+
+                    if (resultSetImage.next()) {
+                        byte[] imgBytes = resultSetImage.getBytes("slika");
+                        if (imgBytes != null && imgBytes.length > 0) {
+                            // Convert the bytes to an ImageIcon
+                            ImageIcon imageIcon = new ImageIcon(imgBytes);
+
+                            // Create a JLabel to display the image
+                            JLabel imageLabel = new JLabel(imageIcon);
+
+                            // Add the JLabel to the container
+                            c.add(imageLabel);
+                        }
+                    }
+                } catch (SQLException ex) {
+                    rezultatObvestila.setText("Napaka pri prikazu slike: " + ex.getMessage());
+                }
+
 
                 povezava.close();
                 rezultatObvestila.setText("Vozilo je bilo uspešno najeto!\n");
@@ -171,7 +197,7 @@ public class rent extends JFrame implements ActionListener {
                 rezultatObvestila.append("Podjetje: " + podjetjeDropdown.getSelectedItem() + "\n");
                 rezultatObvestila.append("Cena: " + izracunajCenoNajema(izbranDatum, (String) koncniDatumNajemaDropdown.getSelectedItem()));
 
-                cenaLabel1.setText(izracunajCenoNajema(zacetniDatumNajemaDropdown.getSelectedItem().toString(), (String) koncniDatumNajemaDropdown.getSelectedItem().toString()) + "€");;
+                cenaLabel1.setText(izracunajCenoNajema(zacetniDatumNajemaDropdown.getSelectedItem().toString(), (String) koncniDatumNajemaDropdown.getSelectedItem().toString()) + "€");
 
             } catch (NumberFormatException | SQLException izjema) {
                 rezultatObvestila.setText("Napaka pri najemu vozila: " + izjema.getMessage());
@@ -181,32 +207,27 @@ public class rent extends JFrame implements ActionListener {
         }
     }
 
-    // Metoda za izračun cene najema (implementirate jo sami)
     private long izracunajCenoNajema(String zacetniDatum, String koncniDatum) {
         LocalDate zacetniDatumLD = LocalDate.parse(zacetniDatum);
         LocalDate koncniDatumLD = LocalDate.parse(koncniDatum);
         long stDni = ChronoUnit.DAYS.between(zacetniDatumLD, koncniDatumLD);
         return 150 * stDni;
-}
+    }
 
-    // Metoda za polnjenje seznama vozil iz baze podatkov
     private void napolniSeznamVozil() {
         try {
             DatabaseConnection povezavaVBazo = new DatabaseConnection();
             Connection povezava = povezavaVBazo.getConnection();
 
-            // Izvedi poizvedbo za pridobitev vseh vozil
             Statement statement = povezava.createStatement();
             ResultSet rezultat = statement.executeQuery("SELECT ID, Registracija FROM Vozilo");
 
-            // Dodaj vozila v seznam
             while (rezultat.next()) {
                 int id = rezultat.getInt("ID");
                 String registracija = rezultat.getString("Registracija");
                 seznamVozil.addItem(id + " - " + registracija);
             }
 
-            // Zapri povezavo
             povezava.close();
 
         } catch (SQLException ex) {
@@ -214,24 +235,20 @@ public class rent extends JFrame implements ActionListener {
         }
     }
 
-    // Metoda za polnjenje seznama podjetij iz baze podatkov
     private void napolniSeznamPodjetij() {
         try {
             DatabaseConnection povezavaVBazo = new DatabaseConnection();
             Connection povezava = povezavaVBazo.getConnection();
 
-            // Izvedi poizvedbo za pridobitev vseh podjetij
             Statement statement = povezava.createStatement();
             ResultSet rezultat = statement.executeQuery("SELECT ID, ime FROM Podjetje");
 
-            // Dodaj podjetja v seznam
             while (rezultat.next()) {
                 int id = rezultat.getInt("ID");
                 String ime = rezultat.getString("ime");
                 podjetjeDropdown.addItem(id + " - " + ime);
             }
 
-            // Zapri povezavo
             povezava.close();
 
         } catch (SQLException ex) {
@@ -240,8 +257,6 @@ public class rent extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        // Tukaj bi lahko preverili, če je uporabnik prijavljen kot administrator
-        // Za demonstracijske namene bomo preprosto prikazali okno za upravljanje z vozili
         EventQueue.invokeLater(() -> {
             JFrame okno = new JFrame("Upravljanje z avtomobili");
             okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

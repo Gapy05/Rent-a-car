@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Statement;
 
 public class Admin extends JFrame implements ActionListener {
     private Container c;
@@ -94,6 +95,29 @@ public Admin() {
     tbarva.setSize(190, 20);
     tbarva.setLocation(250, 250);
     c.add(tbarva);
+
+    // Populate model and barva comboboxes from database
+    try {
+        DatabaseConnection dbConnection = new DatabaseConnection();
+        Connection connection = dbConnection.getConnection();
+
+        // Populate model combobox
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT ime FROM Model");
+        while (resultSet.next()) {
+            tmodel.addItem(resultSet.getString("ime"));
+        }
+
+        // Populate barva combobox
+        resultSet = statement.executeQuery("SELECT ime FROM Barva");
+        while (resultSet.next()) {
+            tbarva.addItem(resultSet.getString("ime"));
+        }
+
+        connection.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
 
     sub = new JButton("Dodaj avtomobil");
     sub.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -182,9 +206,9 @@ public Admin() {
             tout.append("Model: " + model + "\n");
             tout.append("Barva: " + barva + "\n");
             res.setText("Avtomobil uspešno dodan!");
-            res.setText("Napaka pri dodajanju avtomobila!");
         } catch (SQLException | IOException ex) {
             res.setText("Napaka: " + ex.getMessage());
+            System.out.println(ex.getMessage());
         }
     } else if (e.getSource() == reset) {
         tregistracija.setText("");
@@ -207,7 +231,7 @@ public Admin() {
     }
 }
     private int getIdFromName(String table, String name, Connection connection) throws SQLException {
-        String sql = "SELECT ID FROM " + table + " WHERE name = ?";
+        String sql = "SELECT ID FROM " + table + " WHERE ime = ?";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, name);
         ResultSet resultSet = statement.executeQuery();
