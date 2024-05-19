@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="148fb133-e558-4a50-b3a9-359bae0f048e" name="Changes" comment="dodan registration">
-      <change afterPath="$PROJECT_DIR$/src/Admin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/rent.java" afterDir="false" />
+    <list default="true" id="148fb133-e558-4a50-b3a9-359bae0f048e" name="Changes" comment="Dodan admin UI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Admin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Admin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Login.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Registration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Registration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rent.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +61,7 @@
     "Application.Login.executor": "Run",
     "Application.Main.executor": "Run",
     "Application.Registration.executor": "Run",
+    "Application.rent.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ToolWindowGitHub Copilot Chat.ShowToolbar": "false",
@@ -77,7 +78,7 @@
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "configurable.group.tools",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -101,7 +102,8 @@
       <workItem from="1715616581282" duration="127000" />
       <workItem from="1715616727787" duration="7673000" />
       <workItem from="1716049807899" duration="2015000" />
-      <workItem from="1716136071863" duration="11203000" />
+      <workItem from="1716136071863" duration="13886000" />
+      <workItem from="1716155995040" duration="2940000" />
     </task>
     <task id="LOCAL−00001" summary="dodan registration">
       <option name="closed" value="true" />
@@ -117,7 +119,14 @@
       <option name="presentableId" value="LOCAL−00002" />
       <updated>1715621372934</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL−00003" summary="Dodan admin UI">
+      <option name="closed" value="true" />
+      <created>1716151680242</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1716151680243</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,6 +146,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="dodan registration" />
-    <option name="LAST_COMMIT_MESSAGE" value="dodan registration" />
+    <MESSAGE value="Dodan admin UI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dodan admin UI" />
   </component>
 </project>

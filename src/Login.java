@@ -88,37 +88,38 @@ public class Login extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == login) {
             String username = tusername.getText();
-            String password = new String(tpassword.getPassword());
-
-            if (username.isEmpty() || password.isEmpty()) {
-                res.setText("Vsa polja so obvezna!");
-                return;
-            }
+            String password = String.valueOf(tpassword.getPassword());
 
             try {
                 DatabaseConnection dbConnection = new DatabaseConnection();
                 Connection connection = dbConnection.getConnection();
-
-                String query = "SELECT * FROM uporabnik WHERE username =? AND geslo =?";
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, username);
-                preparedStatement.setString(2, PasswordHash.hashPassword(password));
-
-                ResultSet resultSet = preparedStatement.executeQuery();
+                String sql = "SELECT id FROM uporabnik WHERE username = ? AND geslo = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setString(1, username);
+                statement.setString(2, PasswordHash.hashPassword(password));
+                ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) {
-                    res.setText("Uspešna prijava!");
-                    tout.setText("Dobrodošli, " + username + "!");
-                } else {
-                    res.setText("Napaka pri prijavi!");
-                }
+                    int userId = resultSet.getInt("id");
+                    connection.close();
 
-                connection.close();
+                    if (userId == 5) {
+                        new Admin();
+                    } else {
+                        new rent();
+                    }
+
+                    this.setVisible(false);
+                } else {
+                    res.setText("Napačno uporabniško ime ali geslo!");
+                }
             } catch (SQLException ex) {
                 ex.printStackTrace();
+                res.setText("Napaka pri prijavi!");
             }
         } else if (e.getSource() == reset) {
             String def = "";
@@ -126,9 +127,8 @@ public class Login extends JFrame implements ActionListener {
             tpassword.setText(def);
             res.setText(def);
             tout.setText(def);
-        }
-        else if (e.getSource() == register) {
-            MyFrame regiter = new MyFrame();
+        } else if (e.getSource() == register) {
+            MyFrame register = new MyFrame();
             this.setVisible(false);
         }
     }

@@ -320,15 +320,21 @@ class MyFrame extends JFrame implements ActionListener {
             String password = String.valueOf(tgeslo.getPassword());
             String email = temail.getText();
             String phone = ttelefon.getText();
-            String gender = male.isSelected() ? "Moški" : "Ženska";
-            String dob = date.getSelectedItem() + "/" + month.getSelectedItem() + "/" + year.getSelectedItem();
+            String gender = male.isSelected() ? "M" : "Ž";
+            String dob = year.getSelectedItem() + "-" + (month.getSelectedIndex()+1) + "-" + date.getSelectedItem();
+            java.sql.Date sqlDate = java.sql.Date.valueOf(dob);
             Kraj selectedKraj = (Kraj) tkraj.getSelectedItem();
 
-            if (selectedKraj != null) {
+            if (name.isEmpty() || surname.isEmpty() || user.isEmpty() || password.isEmpty() || email.isEmpty() || phone.isEmpty() || dob.isEmpty()) {
+                res.setText("Vsa polja morajo biti izpolnjena!");
+                return;
+            }
+
+            else if (selectedKraj != null) {
                 try {
                     DatabaseConnection dbConnection = new DatabaseConnection();
                     Connection connection = dbConnection.getConnection();
-                    String sql = "{CALL insertUser(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+                    String sql = "INSERT INTO uporabnik (ime, priimek, username, geslo, email, telefon, spol, datum_rojstva, kraj_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     CallableStatement statement = dbConnection.prepareCall(sql, connection);
 
                     statement.setString(1, name);
@@ -338,7 +344,7 @@ class MyFrame extends JFrame implements ActionListener {
                     statement.setString(5, email);
                     statement.setString(6, phone);
                     statement.setString(7, gender);
-                    statement.setString(8, dob);
+                    statement.setDate(8, sqlDate);
                     statement.setInt(9, selectedKraj.getId());
 
                     statement.execute();
@@ -355,12 +361,15 @@ class MyFrame extends JFrame implements ActionListener {
                     tout.append("Datum rojstva: " + dob + "\n");
                     tout.append("Kraj: " + selectedKraj.getIme() + "\n");
                     res.setText("Registracija uspešna!");
+                    Login login = new Login();
+                    this.setVisible(false);
 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     res.setText("Napaka pri registraciji!");
                 }
             }
+
         } else if (e.getSource() == reset) {
             tname.setText("");
             tpriimek.setText("");
