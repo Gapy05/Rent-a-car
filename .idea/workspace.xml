@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="148fb133-e558-4a50-b3a9-359bae0f048e" name="Changes" comment="dodan registration">
-      <change afterPath="$PROJECT_DIR$/lib/postgresql-42.7.3.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Admin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/rent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Login/Login.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Login.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Registration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Registration.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,6 +56,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Application.Admin.executor": "Run",
     "Application.DatabaseConnection.executor": "Run",
     "Application.Login.executor": "Run",
     "Application.Main.executor": "Run",
@@ -99,7 +101,7 @@
       <workItem from="1715616581282" duration="127000" />
       <workItem from="1715616727787" duration="7673000" />
       <workItem from="1716049807899" duration="2015000" />
-      <workItem from="1716136071863" duration="6821000" />
+      <workItem from="1716136071863" duration="11203000" />
     </task>
     <task id="LOCAL−00001" summary="dodan registration">
       <option name="closed" value="true" />

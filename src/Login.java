@@ -16,10 +16,11 @@ public class Login extends JFrame implements ActionListener {
     private JButton reset;
     private JTextArea tout;
     private JLabel res;
+    private JButton register;
 
     public Login() {
         setTitle("Prijava");
-        setBounds(300, 90, 500, 300);
+        setBounds(300, 90, 500, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -70,19 +71,19 @@ public class Login extends JFrame implements ActionListener {
         reset.addActionListener(this);
         c.add(reset);
 
-        tout = new JTextArea();
-        tout.setFont(new Font("Arial", Font.PLAIN, 15));
-        tout.setSize(300, 100);
-        tout.setLocation(50, 220);
-        tout.setLineWrap(true);
-        tout.setEditable(false);
-        c.add(tout);
 
         res = new JLabel("");
         res.setFont(new Font("Arial", Font.PLAIN, 20));
         res.setSize(300, 25);
         res.setLocation(50, 150);
         c.add(res);
+
+        register = new JButton("Registracija");
+        register.setFont(new Font("Arial", Font.PLAIN, 15));
+        register.setSize(150, 20);
+        register.setLocation(150, 210);
+        register.addActionListener(this);
+        c.add(register);
 
         setVisible(true);
     }
@@ -125,6 +126,10 @@ public class Login extends JFrame implements ActionListener {
             tpassword.setText(def);
             res.setText(def);
             tout.setText(def);
+        }
+        else if (e.getSource() == register) {
+            MyFrame regiter = new MyFrame();
+            this.setVisible(false);
         }
     }
 

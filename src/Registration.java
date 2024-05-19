@@ -29,6 +29,7 @@ class Kraj {
         return ime;
     }
 }
+
 class PasswordHash {
     public static String hashPassword(String password) {
         try {
@@ -48,6 +49,7 @@ class PasswordHash {
         return sb.toString();
     }
 }
+
 
 class MyFrame extends JFrame implements ActionListener {
     private Container c;
@@ -79,6 +81,7 @@ class MyFrame extends JFrame implements ActionListener {
     private JTextArea tout;
     private JLabel res;
     private JTextArea resadd;
+    private JButton login;
 
     private String datum[]
             = { "1", "2", "3", "4", "5",
@@ -90,7 +93,7 @@ class MyFrame extends JFrame implements ActionListener {
             "31" };
     private String meseci[]
             = { "Jan", "Feb", "Mar", "Apr",
-            "Maj", "Jun", "Jul", "Aug",
+            "Maj", "Jun", "Jul", "Avg",
             "Sep", "Okt", "Nov", "Dec" };
     private String leta[]
             = { "1995", "1996", "1997", "1998",
@@ -227,13 +230,13 @@ class MyFrame extends JFrame implements ActionListener {
         month = new JComboBox<String>(meseci);
         month.setFont(new Font("Arial", Font.PLAIN, 15));
         month.setSize(60, 20);
-        month.setLocation(360, 330);
+        month.setLocation(300, 330);
         c.add(month);
 
         year = new JComboBox<String>(leta);
         year.setFont(new Font("Arial", Font.PLAIN, 15));
         year.setSize(80, 20);
-        year.setLocation(300, 330);
+        year.setLocation(360, 330);
         c.add(year);
 
         kraj = new JLabel("Kraj");
@@ -277,6 +280,13 @@ class MyFrame extends JFrame implements ActionListener {
         reset.addActionListener(this);
         c.add(reset);
 
+        login= new JButton("Prijava");
+        login.setFont(new Font("Arial", Font.PLAIN, 15));
+        login.setSize(100, 20);
+        login.setLocation(300, 450);
+        login.addActionListener(this);
+        c.add(login);
+
         tout = new JTextArea();
         tout.setFont(new Font("Arial", Font.PLAIN, 15));
         tout.setSize(300, 400);
@@ -301,109 +311,73 @@ class MyFrame extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == sub) {
             String name = tname.getText();
             String surname = tpriimek.getText();
-            String username = tusername.getText();
-            String password = new String(tgeslo.getPassword());
+            String user = tusername.getText();
+            String password = String.valueOf(tgeslo.getPassword());
             String email = temail.getText();
             String phone = ttelefon.getText();
+            String gender = male.isSelected() ? "Moški" : "Ženska";
+            String dob = date.getSelectedItem() + "/" + month.getSelectedItem() + "/" + year.getSelectedItem();
+            Kraj selectedKraj = (Kraj) tkraj.getSelectedItem();
 
-            if (name.isEmpty() || surname.isEmpty() || username.isEmpty() || password.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-                res.setText("Vsa polja so obvezna!");
-                return;
+            if (selectedKraj != null) {
+                try {
+                    DatabaseConnection dbConnection = new DatabaseConnection();
+                    Connection connection = dbConnection.getConnection();
+                    String sql = "{CALL insertUser(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+                    CallableStatement statement = dbConnection.prepareCall(sql, connection);
+
+                    statement.setString(1, name);
+                    statement.setString(2, surname);
+                    statement.setString(3, user);
+                    statement.setString(4, PasswordHash.hashPassword(password));
+                    statement.setString(5, email);
+                    statement.setString(6, phone);
+                    statement.setString(7, gender);
+                    statement.setString(8, dob);
+                    statement.setInt(9, selectedKraj.getId());
+
+                    statement.execute();
+                    connection.close();
+
+                    tout.setText("Registracija uspešna!\n");
+                    tout.append("Podrobnosti:\n");
+                    tout.append("Ime: " + name + "\n");
+                    tout.append("Priimek: " + surname + "\n");
+                    tout.append("Uporabniško ime: " + user + "\n");
+                    tout.append("Email: " + email + "\n");
+                    tout.append("Telefon: " + phone + "\n");
+                    tout.append("Spol: " + gender + "\n");
+                    tout.append("Datum rojstva: " + dob + "\n");
+                    tout.append("Kraj: " + selectedKraj.getIme() + "\n");
+                    res.setText("Registracija uspešna!");
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    res.setText("Napaka pri registraciji!");
+                }
             }
-
-            if (!email.endsWith("@gmail.com") && !email.endsWith("@mail.com") && !email.endsWith("@email.com") && !email.endsWith("@hotmail.com")) {
-                res.setText("Email mora biti veljaven!");
-                return;
-            }
-            String data1;
-            String data
-                    = "Ime : "
-                    + tname.getText() + "\n"
-                    + "Priimek : "
-                    + tpriimek.getText() + "\n"
-                    + "Uporabniško ime : "
-                    + tusername.getText() + "\n"
-                    + "Geslo : "
-                    + new String(tgeslo.getPassword()) + "\n"
-                    + "Email : "
-                    + temail.getText() + "\n"
-                    + "Telefon : "
-                    + ttelefon.getText() + "\n";
-            if (male.isSelected())
-                data1 = "Spol : Moški"
-                        + "\n";
-            else
-                data1 = "Spol : Ženska"
-                        + "\n";
-
-            Map<String, String> monthNumbers = new HashMap<>();
-            monthNumbers.put("Jan", "01");
-            monthNumbers.put("Feb", "02");
-            monthNumbers.put("Mar", "03");
-            monthNumbers.put("Apr", "04");
-            monthNumbers.put("Maj", "05");
-            monthNumbers.put("Jun", "06");
-            monthNumbers.put("Jul", "07");
-            monthNumbers.put("Aug", "08");
-            monthNumbers.put("Sep", "09");
-            monthNumbers.put("Okt", "10");
-            monthNumbers.put("Nov", "11");
-            monthNumbers.put("Dec", "12");
-
-            String dateString = (String)year.getSelectedItem() + "-" + monthNumbers.get((String)month.getSelectedItem()) + "-" + (String)date.getSelectedItem();
-            String data2
-                    = "Datum rojstva : "
-                    + dateString
-                    + "\n";
-
-            String data3 = "Kraj : " + ((Kraj)tkraj.getSelectedItem()).getIme();
-            tout.setText(data + data1 + data2 + data3);
-            tout.setEditable(false);
-            res.setText("Uspešno registriran!");
-
-            try {
-                DatabaseConnection dbConnection = new DatabaseConnection();
-                Connection connection = dbConnection.getConnection();
-
-                String insertSql = "INSERT INTO uporabnik (ime, priimek, username, geslo, email, telefon, spol, datum_rojstva, kraj_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement preparedStatement = connection.prepareStatement(insertSql);
-                preparedStatement.setString(1, tname.getText());
-                preparedStatement.setString(2, tpriimek.getText());
-                preparedStatement.setString(3, tusername.getText());
-                preparedStatement.setString(4, PasswordHash.hashPassword(new String(tgeslo.getPassword())));
-                preparedStatement.setString(5, temail.getText());
-                preparedStatement.setString(6, ttelefon.getText());
-                preparedStatement.setString(7, male.isSelected() ? "M" : "Ž");
-                Date date = Date.valueOf(dateString);
-                preparedStatement.setDate(8, date);
-                preparedStatement.setInt(9, ((Kraj)tkraj.getSelectedItem()).getId());
-
-                preparedStatement.executeUpdate();
-
-                connection.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        else if (e.getSource() == reset) {
-            String def = "";
-            tname.setText(def);
-            tpriimek.setText(def);
-            tusername.setText(def);
-            tgeslo.setText(def);
-            temail.setText(def);
-            ttelefon.setText(def);
-            res.setText(def);
-            tout.setText(def);
+        } else if (e.getSource() == reset) {
+            tname.setText("");
+            tpriimek.setText("");
+            tusername.setText("");
+            tgeslo.setText("");
+            temail.setText("");
+            ttelefon.setText("");
+            male.setSelected(true);
             date.setSelectedIndex(0);
             month.setSelectedIndex(0);
             year.setSelectedIndex(0);
-            resadd.setText(def);
+            tkraj.setSelectedIndex(0);
+            tout.setText("");
+            res.setText("");
+        } else if (e.getSource() == login) {
+            Login login = new Login();
+            this.setVisible(false);
         }
     }
 }
