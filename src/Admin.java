@@ -218,7 +218,7 @@ public Admin() {
         tout.setText("");
         res.setText("");
     } else if (e.getSource() == glavniMeni) {
-        new rent();
+        new adminrent();
         this.setVisible(false);
     } else if (e.getSource() == naloziteSlikoButton) { // Če je uporabnik kliknil gumb za nalaganje slike
         JFileChooser fileChooser = new JFileChooser(); // Ustvari nov izbirnik datotek

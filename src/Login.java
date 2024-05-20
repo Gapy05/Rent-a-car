@@ -108,7 +108,7 @@ public class Login extends JFrame implements ActionListener {
                     String userName = resultSet.getString("username");
 
                     if (userId == 5) {
-                        Admin admin = new Admin();
+                        adminrent adminrent = new adminrent();
                         this.setVisible(false);
                     } else  {
                         rent rentPage = new rent();
